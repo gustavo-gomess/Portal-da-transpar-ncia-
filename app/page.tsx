@@ -1,8 +1,27 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { MetricCard } from "@/components/metric-card"
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react"
+import { ProgressBar } from "@/components/progress-bar"
+import { TrendingUp, TrendingDown, DollarSign, Users, UserCheck, UserX } from "lucide-react"
+import { 
+  getClientesAtivos, 
+  getClientesAtrasados, 
+  getReceitaMensal, 
+  getCustoVariavel, 
+  getCustosFixos, 
+  getPrestacaoContas, 
+  getLucroMensal,
+  META_BAR_SEDE,
+  VALOR_ACUMULADO_BAR,
+  clientes
+} from "@/lib/data"
 
 export default function Dashboard() {
+  const clientesAtivos = getClientesAtivos()
+  const clientesAtrasados = getClientesAtrasados()
+  const receitaMensal = getReceitaMensal(9, 2025)
+  const custoTotal = getCustoVariavel() + getCustosFixos() + getPrestacaoContas()
+  const lucroMensal = getLucroMensal()
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -11,10 +30,22 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Visão geral dos indicadores financeiros de Setembro/2025</p>
         </div>
 
+        {/* Meta do Bar Sede */}
+        <ProgressBar
+          current={VALOR_ACUMULADO_BAR}
+          target={META_BAR_SEDE}
+          title="Projeto QG - O Santuário"
+          subtitle="Meta para aquisição do Bar Sede"
+        />
+
+        {/* Métricas Financeiras */}
         <div className="grid gap-6 md:grid-cols-3">
           <MetricCard
             title="Receita Bruta"
-            value="R$ 7.500,00"
+            value={new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }).format(receitaMensal)}
             description="Total arrecadado no mês"
             icon={<DollarSign className="h-6 w-6" />}
             trend={{ value: "+12%", isPositive: true }}
@@ -23,7 +54,10 @@ export default function Dashboard() {
 
           <MetricCard
             title="Custos Totais"
-            value="R$ 2.100,00"
+            value={new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }).format(custoTotal)}
             description="Fixos, variáveis e prestações"
             icon={<TrendingDown className="h-6 w-6" />}
             trend={{ value: "-5%", isPositive: true }}
@@ -32,11 +66,43 @@ export default function Dashboard() {
 
           <MetricCard
             title="Lucro Líquido"
-            value="R$ 5.400,00"
+            value={new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }).format(lucroMensal)}
             description="Resultado final do mês"
             icon={<TrendingUp className="h-6 w-6" />}
             trend={{ value: "+18%", isPositive: true }}
             className="border-l-4 border-l-accent bg-primary/5"
+          />
+        </div>
+
+        {/* Métricas da Operação */}
+        <div className="grid gap-6 md:grid-cols-3">
+          <MetricCard
+            title="Total de Clientes"
+            value={clientes.length.toString()}
+            description="Base total de clientes"
+            icon={<Users className="h-6 w-6" />}
+            className="border-l-4 border-l-blue-500"
+          />
+
+          <MetricCard
+            title="Clientes Ativos"
+            value={clientesAtivos.length.toString()}
+            description="Pagamentos em dia"
+            icon={<UserCheck className="h-6 w-6" />}
+            trend={{ value: `${((clientesAtivos.length / clientes.length) * 100).toFixed(1)}%`, isPositive: true }}
+            className="border-l-4 border-l-emerald-500"
+          />
+
+          <MetricCard
+            title="Pagamentos Atrasados"
+            value={clientesAtrasados.length.toString()}
+            description="Necessitam atenção"
+            icon={<UserX className="h-6 w-6" />}
+            trend={{ value: `${((clientesAtrasados.length / clientes.length) * 100).toFixed(1)}%`, isPositive: false }}
+            className="border-l-4 border-l-red-500"
           />
         </div>
 

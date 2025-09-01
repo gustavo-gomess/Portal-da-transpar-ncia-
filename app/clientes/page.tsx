@@ -4,21 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Users, UserCheck, UserX } from "lucide-react"
 import { useState } from "react"
-
-const clientes = [
-  {
-    id: 1,
-    nome: "Carlos Alberto",
-    status: "adimplente",
-    ultimoPagamento: "01/09/2025",
-    parceiroResponsavel: "Gustavo",
-  },
-  { id: 2, nome: "Maria Santos", status: "adimplente", ultimoPagamento: "28/08/2025", parceiroResponsavel: "Ana" },
-  { id: 3, nome: "Pedro Costa", status: "atrasado", ultimoPagamento: "15/08/2025", parceiroResponsavel: "João" },
-  { id: 4, nome: "Ana Oliveira", status: "adimplente", ultimoPagamento: "30/08/2025", parceiroResponsavel: "Gustavo" },
-  { id: 5, nome: "José Silva", status: "atrasado", ultimoPagamento: "10/08/2025", parceiroResponsavel: "Ana" },
-  { id: 6, nome: "Fernanda Lima", status: "adimplente", ultimoPagamento: "02/09/2025", parceiroResponsavel: "João" },
-]
+import { clientes, getClientesAtivos, getClientesAtrasados } from "@/lib/data"
 
 const parceiros = ["Todos", "Gustavo", "Ana", "João"]
 
@@ -26,8 +12,8 @@ export default function Clientes() {
   const [filtroStatus, setFiltroStatus] = useState("Todos")
   const [filtroParceiro, setFiltroParceiro] = useState("Todos")
 
-  const clientesAdimplentes = clientes.filter((c) => c.status === "adimplente").length
-  const clientesAtrasados = clientes.filter((c) => c.status === "atrasado").length
+  const clientesAdimplentes = getClientesAtivos().length
+  const clientesAtrasados = getClientesAtrasados().length
 
   const clientesFiltrados = clientes.filter((cliente) => {
     const statusMatch = filtroStatus === "Todos" || cliente.status === filtroStatus.toLowerCase()
